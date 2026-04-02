@@ -343,12 +343,9 @@
                 // window.location.href = 'itms-services://?action=download-manifest&url=YOUR_PLIST_URL';
             } else {
                 // 下载 Android apk
-                var downloadUrl = 'http://112.121.169.10:8082/download/junhong-junrong-v1.0.apk';
+                var downloadUrl = 'https://raw.githubusercontent.com/allenchenkm/JHJR/main/%E5%90%9B%E5%BC%98%E5%90%9B%E8%9E%8Dv1.0.apk';
                 var a = document.createElement('a');
                 a.href = downloadUrl;
-                // 注意：由于 GitHub Pages 是 HTTPS 而下载链接是 HTTP，
-                // 在现代浏览器中依然可能会被静默拦截。
-                // 如果发现点击无效，用户需要手动复制链接或使用 HTTP 访问页面。
                 a.target = '_blank'; 
                 document.body.appendChild(a);
                 a.click();
