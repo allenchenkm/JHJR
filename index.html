@@ -270,6 +270,24 @@
         </div>
     </div>
 
+    <!-- 复制链接提示遮罩层 -->
+    <div class="wechat-mask" id="copyMask" style="background: rgba(0, 0, 0, 0.85); display: none; align-items: center; justify-content: center; text-align: center; padding: 20px;">
+        <div style="background: white; border-radius: 16px; padding: 30px 20px; width: 90%; max-width: 320px; color: #333; position: relative;">
+            <div style="font-size: 18px; font-weight: bold; margin-bottom: 15px; color: #D32F2F;">安全限制拦截</div>
+            <p style="font-size: 14px; line-height: 1.6; color: #666; margin-bottom: 20px; text-align: left;">
+                由于浏览器安全策略限制，无法直接在当前页面下载安装包。<br><br>
+                请点击下方按钮复制下载链接，然后打开您的<strong>手机自带浏览器</strong>（如 Safari、Chrome 等）粘贴并访问即可下载。
+            </p>
+            <div style="background: #F5F7FA; padding: 10px; border-radius: 8px; font-size: 12px; color: #999; word-break: break-all; margin-bottom: 20px; user-select: all;" id="downloadUrlText">
+                http://112.121.169.10:8082/download/junhong-junrong-v1.0.apk
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="document.getElementById('copyMask').style.display='none'" style="flex: 1; padding: 12px 0; border: none; background: #F5F7FA; border-radius: 25px; color: #666; font-size: 15px; font-weight: 500;">取消</button>
+                <button onclick="copyToClipboard()" style="flex: 1; padding: 12px 0; border: none; background: #D32F2F; border-radius: 25px; color: white; font-size: 15px; font-weight: 500;">复制链接</button>
+            </div>
+        </div>
+    </div>
+
     <div class="main-content">
         <div class="app-card">
             <div class="app-icon-wrapper">
@@ -331,6 +349,22 @@
             return ua.match(/MicroMessenger/i) == 'micromessenger';
         }
 
+        function copyToClipboard() {
+            var text = document.getElementById('downloadUrlText').innerText.trim();
+            var textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert('链接复制成功，请去浏览器粘贴打开！');
+                document.getElementById('copyMask').style.display='none';
+            } catch (err) {
+                alert('复制失败，请手动长按链接复制。');
+            }
+            document.body.removeChild(textArea);
+        }
+
         function handleDownload(platform) {
             if (isWeChat()) {
                 document.getElementById('wechatMask').style.display = 'block';
@@ -342,16 +376,22 @@
                 alert('即将开始下载 iOS 版本...');
                 // window.location.href = 'itms-services://?action=download-manifest&url=YOUR_PLIST_URL';
             } else {
-                // 下载 Android apk
-                // 注意: 由于您的页面部署在 Github Pages (HTTPS)，而下载链接是 HTTP，浏览器会因为"混合内容(Mixed Content)"的安全策略拦截下载。
-                // 解决方案: 使用动态创建 a 标签并设置 target="_blank" 在新标签页打开下载链接，从而绕过部分浏览器的直接拦截。
+                // 检查当前页面是否是 HTTPS
+                var isHttps = window.location.protocol === 'https:';
                 var downloadUrl = 'http://112.121.169.10:8082/download/junhong-junrong-v1.0.apk';
-                var a = document.createElement('a');
-                a.href = downloadUrl;
-                a.target = '_blank'; // 在新窗口/新标签页打开以触发下载
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+
+                if (isHttps) {
+                    // 如果在 HTTPS 页面下载 HTTP 文件，直接弹出复制提示框
+                    document.getElementById('copyMask').style.display = 'flex';
+                } else {
+                    // 如果本身就是 HTTP，则直接下载
+                    var a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.target = '_blank';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
             }
         }
     </script>
